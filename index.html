@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Vibe Check ✨</title>
+    <style>
+        /* SAME STYLES AS BEFORE - COPY PASTE THE CSS FROM PREVIOUS RESPONSE HERE */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        :root { --bg: #0a0a0a; --card-bg: #161616; --text: #ffffff; --accent-1: #ccff00; --accent-2: #ff00ff; --accent-3: #00ffff; --glass: rgba(255, 255, 255, 0.05); --border: 1px solid rgba(255, 255, 255, 0.1); --radius: 24px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem; overflow-x: hidden; }
+        header { text-align: center; margin-bottom: 3rem; width: 100%; max-width: 600px; }
+        h1 { font-size: 3rem; font-weight: 700; background: linear-gradient(90deg, var(--accent-1), var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .subtitle { opacity: 0.6; font-size: 1.1rem; }
+        .search-container { position: relative; width: 100%; margin-top: 2rem; }
+        input { width: 100%; padding: 1.5rem; border-radius: 50px; background: var(--card-bg); border: 2px solid #333; color: white; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent-2); box-shadow: 0 0 20px rgba(255, 0, 255, 0.3); }
+        .search-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--accent-1); color: black; border: none; padding: 0.8rem 1.5rem; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .search-btn:hover { transform: translateY(-50%) scale(1.05); }
+        #loader { display: none; margin-top: 3rem; text-align: center; }
+        .glitch-text { font-size: 1.5rem; animation: glitch 1s infinite; }
+        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
+        #dashboard { display: none; width: 100%; max-width: 1000px; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto; gap: 1.5rem; margin-top: 2rem; opacity: 0; transform: translateY(20px); transition: 0.5s all ease; }
+        #dashboard.visible { opacity: 1; transform: translateY(0); display: grid; }
+        .card { background: var(--card-bg); border: var(--border); border-radius: var(--radius); padding: 1.5rem; position: relative; overflow: hidden; transition: 0.3s; }
+        .card:hover { border-color: var(--accent-3); transform: translateY(-5px); }
+        .card h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; color: #888; }
+        .hero-card { grid-column: span 2; background: linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(40,40,40,1) 100%); }
+        .hero-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem; }
+        .hero-tagline { color: var(--accent-1); font-size: 1.2rem; }
+        .sentiment-card { grid-column: span 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255, 0, 255, 0.05); border-color: rgba(255, 0, 255, 0.2); }
+        .score { font-size: 4rem; font-weight: 700; color: var(--accent-2); }
+        .specs-card { grid-column: span 1; }
+        .specs-list li { list-style: none; display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .reviews-card { grid-column: span 2; }
+        .review-bubble { background: var(--glass); padding: 1rem; border-radius: 16px; margin-bottom: 0.8rem; font-size: 0.95rem; border-left: 3px solid var(--accent-3); }
+        .verdict-card { grid-column: span 3; text-align: center; background: linear-gradient(90deg, var(--accent-1), var(--accent-3)); color: black; font-weight: bold; }
+        .verdict-text { font-size: 1.5rem; }
+        @media (max-width: 768px) { #dashboard { grid-template-columns: 1fr; } .hero-card, .sentiment-card, .specs-card, .reviews-card, .verdict-card { grid-column: span 1; } h1 { font-size: 2.5rem; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>VIBE CHECK ✨</h1>
+        <div class="subtitle">The ultimate product story dashboard.</div>
+        <div class="search-container">
+            <input type="text" id="productInput" placeholder="Enter a product (e.g., iPhone 15, Nike Dunks)...">
+            <button class="search-btn" onclick="fetchVibe()">CHECK IT</button>
+        </div>
+    </header>
+
+    <div id="loader">
+        <div class="glitch-text">ASKING THE INTERNET... 🛸</div>
+    </div>
+
+    <main id="dashboard">
+        </main>
+
+    <script>
+        async function fetchVibe() {
+            const input = document.getElementById('productInput').value;
+            const loader = document.getElementById('loader');
+            const dashboard = document.getElementById('dashboard');
+
+            if (!input) return alert("Bestie, you gotta type something first.");
+
+            // Reset
+            dashboard.classList.remove('visible');
+            dashboard.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                // CALL THE REAL BACKEND
+                const response = await fetch(`/.netlify/functions/get-vibe?product=${encodeURIComponent(input)}`);
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+
+                // Render
+                renderDashboard(data);
+                
+                loader.style.display = 'none';
+                dashboard.style.display = 'grid';
+                setTimeout(() => dashboard.classList.add('visible'), 50);
+
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                alert("The vibe check failed. Try again later!");
+            }
+        }
+
+        function renderDashboard(data) {
+            const dashboard = document.getElementById('dashboard');
+            
+            dashboard.innerHTML = `
+                <div class="card hero-card">
+                    <h3>The Subject</h3>
+                    <div class="hero-title">${data.name}</div>
+                    <div class="hero-tagline">${data.tagline}</div>
+                </div>
+                <div class="card sentiment-card">
+                    <h3>Vibe Score</h3>
+                    <div class="score">${data.score}%</div>
+                    <div style="margin-top:10px; color: #fff; font-weight:bold;">${data.vibe}</div>
+                </div>
+                <div class="card specs-card">
+                    <h3>The Specs</h3>
+                    <ul class="specs-list">
+                        ${data.specs.map(s => `<li><span style="opacity:0.6">${s.k}</span> <span>${s.v}</span></li>`).join('')}
+                    </ul>
+                </div>
+                <div class="card reviews-card">
+                    <h3>The Tea ☕️</h3>
+                    ${data.reviews.map(r => `<div class="review-bubble">"${r}"</div>`).join('')}
+                </div>
+                <div class="card verdict-card">
+                    <div class="verdict-text">${data.verdict}</div>
+                </div>
+            `;
+        }
+
+        document.getElementById('productInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') fetchVibe();
+        });
+    </script>
+</body>
+</html>

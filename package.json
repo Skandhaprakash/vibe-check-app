@@ -1,0 +1,9 @@
+{
+  "name": "vibe-check-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "@google/generative-ai": "^0.1.3"
+  }
+}
+
+
